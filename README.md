@@ -9,17 +9,17 @@ A pure C++ implementation of the Backpropagation algorithm based on the seminal 
 
 This repository focuses on understanding the "first principles" of Deep Learning by implementing the math equations directly without using high-level frameworks like TensorFlow or PyTorch.
 
-## 📄 Reference Paper
+## Reference Paper
 > **Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986).**
 > Learning representations by back-propagating errors. *Nature*, 323(6088), 533-536.
 
-## ✨ Features
+## Features
 * **From Scratch:** Implemented using only C++ standard library (`<vector>`, `<cmath>`). No external linear algebra libraries were used to maximize learning of the core algorithms.
 * **Momentum Support:** Implements Equation 9 from the paper ($\Delta w(t) = -\epsilon \partial E/\partial w(t) + \alpha \Delta w(t-1)$) to speed up convergence.
 * **Symmetry Detection:** Includes the specific experiment described in the paper (detecting symmetry in 6-bit input vectors) to prove the necessity of hidden layers.
 * **Flexible Architecture:** Supports arbitrary number of layers and neurons.
 
-## 📂 Project Structure
+## Project Structure
 ```text
 nn-rumelhart-implementation/
 ├── src/
@@ -29,7 +29,7 @@ nn-rumelhart-implementation/
 └── README.md            # Documentation
 ````
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -75,7 +75,7 @@ After building, run the executable:
 .\Debug\neural_net.exe
 ```
 
-## 📊 Experiments Included
+## Experiments Included
 
 The program automatically runs two main demonstrations:
 
@@ -88,7 +88,7 @@ The program automatically runs two main demonstrations:
       * **Task:** Detect if the pattern is symmetric around the center (e.g., `1 1 0 0 1 1` is symmetric, `1 0 0 1 0 0` is not).
       * **Result:** Demonstrates that hidden layers are essential for this task.
 
-## 🧮 Implemented Equations
+## Implemented Equations
 
 The code strictly follows the notation from the 1986 paper:
 
@@ -100,11 +100,11 @@ The code strictly follows the notation from the 1986 paper:
       * $\epsilon$ (epsilon) = Learning rate
       * $\alpha$ (alpha) = Momentum coefficient
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
 
-## 👤 Author
+## Author
 
 **RandyRahmansyah**
 
