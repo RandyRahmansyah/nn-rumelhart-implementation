@@ -56,7 +56,7 @@ cmake --build .
 If you don't have CMake, you can compile the single source file directly:
 
 ```bash
-g++ -O3 -std=c++17 src/neural.cpp -o neural_net
+g++ -O3 -std=c++17 src/neural.cpp -o neural
 ```
 
 ### Running the Experiment
@@ -66,13 +66,13 @@ After building, run the executable:
 **Linux/Mac:**
 
 ```bash
-./neural_net
+./neural
 ```
 
 **Windows:**
 
 ```cmd
-.\Debug\neural_net.exe
+.\Debug\neural.exe
 ```
 
 ## Experiments Included
