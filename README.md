@@ -1,8 +1,3 @@
-Tidak perlu bingung. Silakan **salin semua teks di dalam kotak abu-abu di bawah ini**.
-
-Ini adalah isi lengkap untuk file `README.md` Anda:
-
-````markdown
 # Neural Network Backpropagation Implementation (Rumelhart, 1986)
 
 A pure C++ implementation of the Backpropagation algorithm based on the seminal paper **"Learning representations by back-propagating errors"** by David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams (Nature, 1986).
@@ -14,17 +9,16 @@ This repository focuses on understanding the "first principles" of Deep Learning
 > Learning representations by back-propagating errors. *Nature*, 323(6088), 533-536.
 
 ## Features
-* **From Scratch:** Implemented using only C++ standard library (`<vector>`, `<cmath>`). No external linear algebra libraries were used to maximize learning of the core algorithms.
-* **Momentum Support:** Implements Equation 9 from the paper ($\Delta w(t) = -\epsilon \partial E/\partial w(t) + \alpha \Delta w(t-1)$) to speed up convergence.
-* **Symmetry Detection:** Includes the specific experiment described in the paper (detecting symmetry in 6-bit input vectors) to prove the necessity of hidden layers.
+* **From Scratch:** Implemented using only C++ standard library (`<vector>`, `<cmath>`). No external linear algebra libraries were used.
+* **Momentum Support:** Implements Equation 9 from the paper ($\Delta w(t) = -\epsilon \partial E/\partial w(t) + \alpha \Delta w(t-1)$).
+* **Symmetry Detection:** Includes the specific experiment described in the paper (detecting symmetry in 6-bit input vectors).
 * **Flexible Architecture:** Supports arbitrary number of layers and neurons.
 
 ## Project Structure
 ```text
 nn-rumelhart-implementation/
 ├── src/
-│   └── neural.cpp       # Single-file implementation (Class + Experiments)
-├── CMakeLists.txt       # CMake build configuration
+│   └── neural.cpp       # Single-file implementation
 ├── LICENSE              # MIT License
 └── README.md            # Documentation
 ````
@@ -34,45 +28,29 @@ nn-rumelhart-implementation/
 ### Prerequisites
 
   * C++ Compiler (GCC, Clang, or MSVC)
-  * CMake (Version 3.10 or higher)
 
-### Build Instructions
+### Build & Run Instructions
 
-**Option 1: Using CMake (Recommended)**
+Since this is a single-file implementation, you can compile it directly using your terminal.
 
-```bash
-# 1. Create a build directory
-mkdir build
-cd build
-
-# 2. Generate build files
-cmake ..
-
-# 3. Compile
-cmake --build .
-```
-
-**Option 2: Manual Compilation (g++)**
-If you don't have CMake, you can compile the single source file directly:
+**Linux / macOS:**
 
 ```bash
-!g++ -O2 neural.cpp -o neural
+# 1. Compile
+g++ -O3 -std=c++17 src/neural.cpp -o neural_net
+
+# 2. Run
+./neural_net
 ```
 
-### Running the Experiment
-
-After building, run the executable:
-
-**Linux/Mac:**
-
-```bash
-./neural
-```
-
-**Windows:**
+**Windows (MinGW/CMD):**
 
 ```cmd
-.\Debug\neural.exe
+:: 1. Compile
+g++ -O3 -std=c++17 src/neural.cpp -o neural_net.exe
+
+:: 2. Run
+neural_net.exe
 ```
 
 ## Experiments Included
@@ -85,7 +63,7 @@ The program automatically runs two main demonstrations:
 2.  **Symmetry Detection (The Paper's Experiment):**
 
       * **Input:** 6-bit binary vectors.
-      * **Task:** Detect if the pattern is symmetric around the center (e.g., `1 1 0 0 1 1` is symmetric, `1 0 0 1 0 0` is not).
+      * **Task:** Detect if the pattern is symmetric around the center.
       * **Result:** Demonstrates that hidden layers are essential for this task.
 
 ## Implemented Equations
@@ -104,9 +82,6 @@ The code strictly follows the notation from the 1986 paper:
 
 This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
 
-## Author
+## 👤 Author
 
 **RandyRahmansyah**
-
-```
-```
