@@ -56,7 +56,7 @@ cmake --build .
 If you don't have CMake, you can compile the single source file directly:
 
 ```bash
-g++ -O3 -std=c++17 src/neural.cpp -o neural
+!g++ -O2 neural.cpp -o neural
 ```
 
 ### Running the Experiment
