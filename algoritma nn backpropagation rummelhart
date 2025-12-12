@@ -1,0 +1,235 @@
+#include <iostream>
+#include <cmath> 
+#include <cstdlib> 
+#include <ctime>   
+#include <iomanip> 
+#include "dataset.h"
+
+// Aktivasi bipolar
+double f(double x) {
+    return std::tanh(x);
+}
+
+// Turunan f(x) berdasarkan output y
+double fprime(double y) {
+    return (1.0 - y*y);
+}
+
+// Generate bobot acak kecil berdasarkan fan-in
+double randWeight(int fanin) {
+    double limit = 0.7 / std::sqrt(fanin);
+    return ((double)rand() / RAND_MAX) * 2.0 * limit - limit;
+}
+
+// Fungsi untuk menghitung akurasi dan error metrics
+void evaluate_performance(
+    const double (&inputs_ref)[num_cases][n_input], 
+    const double (&targets_ref)[num_cases][n_output],
+    double (&w1)[n_hidden][n_input + 1], 
+    double (&w2)[n_output][n_hidden + 1],
+    double& accuracy, 
+    double& mse, 
+    double& mae
+) {
+    const double threshold = 0.5; // Ambang batas untuk akurasi
+    int correct_predictions = 0;
+    int total_elements = 0;
+    double total_mse = 0.0;
+    double total_mae = 0.0;
+
+    for (int c = 0; c < num_cases; c++) {
+        // Akses input dan target menggunakan subscripting langsung dari reference
+        const double* x = inputs_ref[c]; // x adalah pointer ke array const
+        const double* t = targets_ref[c]; // t adalah pointer ke array const
+
+        // Forward Pass untuk evaluasi
+        double hidden[n_hidden];
+        double hidden_b[n_hidden + 1]; // + bias
+
+        for (int h = 0; h < n_hidden; h++) {
+            double sum = 0.0;
+            for (int i = 0; i < n_input; i++) {
+                sum += w1[h][i] * x[i];
+            }
+            sum += w1[h][n_input] * 1.0; // bias
+            hidden[h] = f(sum);
+        }
+        for (int h = 0; h < n_hidden; h++) hidden_b[h] = hidden[h];
+        hidden_b[n_hidden] = 1.0;
+
+        double out[n_output];
+        for (int o = 0; o < n_output; o++) {
+            double sum = 0.0;
+            for (int h = 0; h < n_hidden + 1; h++) {
+                sum += w2[o][h] * hidden_b[h];
+            }
+            out[o] = f(sum);
+        }
+
+        // Evaluasi per elemen output
+        for (int o = 0; o < n_output; o++) {
+            total_elements++;
+            // Akurasi: cocok jika tanda output dan target sama (mengabaikan magnitudo kecil)
+            if ((out[o] >= 0 && t[o] >= 0) || (out[o] < 0 && t[o] < 0)) {
+                correct_predictions++;
+            }
+            // MSE
+            double err = (t[o] - out[o]);
+            total_mse += err * err;
+            // MAE
+            total_mae += std::abs(err);
+        }
+    }
+
+    accuracy = (double)correct_predictions / total_elements;
+    mse = total_mse / total_elements;
+    mae = total_mae / total_elements;
+}
+
+
+int main() {
+    srand(time(NULL));
+
+    const int n_input_total  = n_input + 1;  // + bias
+    const int n_hidden_total = n_hidden + 1; // + bias
+
+    // Inisialisasi Bobot
+    double w1[n_hidden][n_input_total];
+    for (int h = 0; h < n_hidden; h++)
+        for (int i = 0; i < n_input_total; i++)
+            w1[h][i] = randWeight(n_input_total);
+
+    double w2[n_output][n_hidden_total];
+    for (int o = 0; o < n_output; o++)
+        for (int h = 0; h < n_hidden_total; h++)
+            w2[o][h] = randWeight(n_hidden_total);
+
+    double hidden[n_hidden];
+    double hidden_b[n_hidden_total];
+    double out[n_output];
+
+    double d_out[n_output];
+    double d_hid[n_hidden];
+
+    double lr = 0.05;
+    int epochs = 5000;
+
+    std::cout << std::fixed << std::setprecision(6); // Format output angka desimal
+
+    for (int epoch = 0; epoch < epochs; epoch++) {
+        double total_err = 0.0;
+
+        for (int c = 0; c < num_cases; c++) {
+            // Akses input dan target langsung dari array global
+            double* x = inputs[c];
+            double* t = targets[c];
+
+            // FORWARD PASS
+            for (int h = 0; h < n_hidden; h++) {
+                double sum = 0.0;
+                for (int i = 0; i < n_input; i++) {
+                    sum += w1[h][i] * x[i];
+                }
+                sum += w1[h][n_input] * 1.0;  // bias
+                hidden[h] = f(sum);
+            }
+            for (int h = 0; h < n_hidden; h++) hidden_b[h] = hidden[h];
+            hidden_b[n_hidden] = 1.0;
+
+            for (int o = 0; o < n_output; o++) {
+                double sum = 0.0;
+                for (int h = 0; h < n_hidden_total; h++) {
+                    sum += w2[o][h] * hidden_b[h];
+                }
+                out[o] = f(sum);
+                double err_term = (t[o] - out[o]);
+                total_err += 0.5 * err_term * err_term;
+            }
+
+            // BACKWARD PASS
+            for (int o = 0; o < n_output; o++) {
+                d_out[o] = fprime(out[o]) * (out[o] - t[o]); // Gradient Descent
+            }
+
+            for (int h = 0; h < n_hidden; h++) {
+                double s = 0.0;
+                for (int o = 0; o < n_output; o++) {
+                    s += d_out[o] * w2[o][h];
+                }
+                d_hid[h] = fprime(hidden[h]) * s;
+            }
+
+            // UPDATE BOBOT
+            for (int o = 0; o < n_output; o++) {
+                for (int h = 0; h < n_hidden_total; h++) {
+                    w2[o][h] -= lr * d_out[o] * hidden_b[h]; // Gradient Descent
+                }
+            }
+
+            for (int h = 0; h < n_hidden; h++) {
+                for (int i = 0; i < n_input; i++) {
+                    w1[h][i] -= lr * d_hid[h] * x[i]; // Gradient Descent
+                }
+                w1[h][n_input] -= lr * d_hid[h] * 1.0;
+            }
+        }
+
+        if ((epoch+1) % 500 == 0) {
+            std::cout << "Epoch " << std::setw(4) << epoch+1 << " | Error (SSE) = " << total_err << "\n";
+        }
+    }
+
+    // --- ANALISIS DAN RINGKASAN DI AKHIR ---
+
+    std::cout << "\n" << std::string(50, '=') << "\n";
+    std::cout << "         ANALISIS HASIL PELATIHAN\n";
+    std::cout << std::string(50, '=') << "\n";
+
+    // Bagian 1: Ringkasan Pelatihan
+    std::cout << "\n--- [1] Ringkasan Pelatihan ---\n";
+    std::cout << "Jumlah Epoch: " << epochs << "\n";
+    std::cout << "Learning Rate: " << lr << "\n";
+    std::cout << "Arsitektur Jaringan: " << n_input << " -> " << n_hidden << " -> " << n_output << "\n";
+    std::cout << "Fungsi Aktivasi: tanh\n";
+    std::cout << "Jenis Tugas: Autoencoder\n";
+
+    // Bagian 2: Metrik Performa
+    std::cout << "\n--- [2] Metrik Performa ---\n";
+    double final_accuracy, final_mse, final_mae;
+    // Panggil fungsi evaluasi dengan reference ke array global
+    evaluate_performance(inputs, targets, w1, w2, final_accuracy, final_mse, final_mae);
+
+    std::cout << "Akurasi (berdasarkan tanda output/target): " << final_accuracy * 100.0 << "%\n";
+    std::cout << "Mean Squared Error (MSE): " << final_mse << "\n";
+    std::cout << "Mean Absolute Error (MAE): " << final_mae << "\n";
+
+    // Bagian 3: Representasi Hidden Layer
+    std::cout << "\n--- [3] Representasi Hidden Layer ---\n";
+    for (int c = 0; c < num_cases; c++) {
+        // Akses input langsung dari array global
+        double* x = inputs[c];
+        double h_repr[n_hidden];
+
+        for (int h = 0; h < n_hidden; h++) {
+            double sum = 0.0;
+            for (int i = 0; i < n_input; i++) {
+                sum += w1[h][i] * x[i];
+            }
+            sum += w1[h][n_input] * 1.0;
+            h_repr[h] = f(sum);
+        }
+
+        std::cout << "Case " << c << ": (";
+        for (int h = 0; h < n_hidden; h++) {
+             std::cout << h_repr[h];
+             if (h < n_hidden - 1) std::cout << ", ";
+        }
+        std::cout << ")\n";
+    }
+
+    std::cout << "\n" << std::string(50, '=') << "\n";
+    std::cout << "           PELATIHAN SELESAI\n";
+    std::cout << std::string(50, '=') << "\n";
+
+    return 0;
+}
