@@ -1,0 +1,59 @@
+#ifndef DATASET_H
+#define DATASET_H
+
+// --- Konfigurasi Jaringan dan Dataset ---
+// Definisikan ukuran dataset dan jaringan di sini
+const int num_cases = 4;      // Jumlah pola data
+const int n_input   = 9;      // Jumlah unit input (3x3 grid diratakan)
+const int n_hidden  = 5;      // Jumlah unit hidden (bisa diubah)
+const int n_output  = 9;      // Jumlah unit output (sama dengan input untuk autoencoder)
+
+/*
+Deskripsi Pola (3x3):
+Pola 0: Garis vertikal tengah
+. # .
+. # .
+. # .
+Diratakan: {+1,-1,+1,-1,+1,-1,+1,-1,+1}
+
+Pola 1: Garis horizontal tengah
+. . .
+# # #
+. . .
+Diratakan: {-1,-1,-1,+1,+1,+1,-1,-1,-1}
+
+Poli 2: Kotak kosong dengan titik tengah
+# # #
+# . #
+# # #
+Diratakan: {+1,+1,+1,+1,-1,+1,+1,+1,+1}
+
+Pola 3: Diagonal X
+# . #
+. # .
+# . #
+Diratakan: {+1,-1,+1,-1,+1,-1,+1,-1,+1}
+*/
+
+// Dataset Input (dan Target untuk Autoencoder)
+// Menggunakan +1 untuk '#', -1 untuk '.'
+double inputs[num_cases][n_input] = {
+    // Pola 0: Vertikal tengah
+    {+1, -1, +1, +1, -1, +1, +1, -1, +1},
+    // Pola 1: Horizontal tengah
+    {-1, -1, -1, +1, +1, +1, -1, -1, -1},
+    // Pola 2: Kotak kosong + titik tengah
+    {+1, +1, +1, +1, -1, +1, +1, +1, +1},
+    // Pola 3: Diagonal X
+    {+1, -1, +1, -1, +1, -1, +1, -1, +1}
+};
+
+// Dataset Target (untuk Autoencoder, target = input)
+double targets[num_cases][n_output] = {
+    {+1, -1, +1, +1, -1, +1, +1, -1, +1},
+    {-1, -1, -1, +1, +1, +1, -1, -1, -1},
+    {+1, +1, +1, +1, -1, +1, +1, +1, +1},
+    {+1, -1, +1, -1, +1, -1, +1, -1, +1}
+};
+
+#endif 
